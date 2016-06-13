@@ -1,3 +1,7 @@
+* {
+    font-family: 'Open Sans', sans-serif;
+}
+
 html, body {
     height: 100%;
 }
@@ -10,15 +14,14 @@ body {
     background-attachment: fixed;
 }
 
-nav#main-footer a.btn {
-    
-    width: 100px;
-    margin-right: 20px;
-}
-
 div#main-content {
     position: relative;
-    margin: 70px 20px;
+    margin: 70px 20px 0px 20px;
+}
+
+div#main-content * {
+    
+    color: white;
 }
 
 .card {
@@ -31,7 +34,11 @@ div#main-content {
     height: 143px;
 }
 
-#player-zones .card {
+.card-stack-zone {
+    position: relative;
+}
+
+.card-stack-zone .card {
     position: absolute;
 }
 
