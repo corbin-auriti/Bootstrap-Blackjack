@@ -69,6 +69,79 @@
                 <h3></h3>
             </div>
         </div>
+        <div id="new-game-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="new-game-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h3>New Game</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="new-game-background-select">Background Image</label>
+                                            <select id="new-game-background-select" name="new-game-background-select">
+                                                <option value="/img/background.jpg">Blue Background</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="new-game-num-decks">Number of Decks</label>
+                                            <select id="new-game-num-decks" name="new-game-num-decks">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-default pull-right">Add Player</button>
+                                            <label for="new-game-num-decks">Players</label>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <td width="70%">Name</td>
+                                                        <td width="30%">Starting Money</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="new-game-players-tbody">
+                                                    <tr>
+                                                        <td>
+                                                            <input type="hidden" class="player-number" value="1" />
+                                                            <input type="text" maxlength="10" class="form-control player-name" value="John Doe" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="player-money" value="100" />
+                                                        </td>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Start Game</button>
+                    </div>
+                </div>
+            <div>
+        </div>
         <script src="./js/main.js"></script>
     </body>
 </html>

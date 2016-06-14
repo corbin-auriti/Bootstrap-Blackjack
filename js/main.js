@@ -109,6 +109,11 @@ function renderPlayer(player) {
 // Reset current game and create a new game with the newly loaded players and game settings
 function newGame() {
     
+    
+}
+
+function onStartGame() {
+
     currentGame = {
         deck: [],
         players: [],
