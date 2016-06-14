@@ -36,6 +36,7 @@ div#main-content * {
 
 .card-stack-zone {
     position: relative;
+    height: 280px;
 }
 
 .card-stack-zone .card {
