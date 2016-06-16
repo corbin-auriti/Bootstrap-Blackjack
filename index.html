@@ -23,7 +23,7 @@
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#">New Game</a></li>
+                        <li><a href="#" onclick="newGame()">New Game</a></li>
                     </ul>
                 </div>
             </div>
@@ -42,13 +42,13 @@
                                 <div class="card face-down">
                                 </div>
                             </div>
-                            <div class="col-xs-8 card-stack-zone stack-down">
+                            <div id="dealer-card-zone" class="col-xs-8 card-stack-zone stack-down">
                                 
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
-                                <h2 class="text-center">0 <small>pts</small></h2>
+                                <h2 class="text-center"><span id="dealer-current-points">0</span> <small>pts</small></h2>
                             </div>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                 <h3></h3>
             </div>
         </div>
-        <div id="new-game-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="new-game-modal-label" aria-hidden="true">
+        <div id="new-game-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="new-game-modal-label" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -83,8 +83,8 @@
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="new-game-background-select">Background Image</label>
-                                            <select id="new-game-background-select" name="new-game-background-select">
-                                                <option value="/img/background.jpg">Blue Background</option>
+                                            <select id="new-game-background-select" name="new-game-background-select" class="form-control">
+                                                <option value="/img/background.jpg" selected>Blue Background</option>
                                             </select>
                                         </div>
                                     </div>
@@ -93,8 +93,8 @@
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="new-game-num-decks">Number of Decks</label>
-                                            <select id="new-game-num-decks" name="new-game-num-decks">
-                                                <option value="1">1</option>
+                                            <select id="new-game-num-decks" name="new-game-num-decks" class="form-control">
+                                                <option value="1" selected>1</option>
                                                 <option value="2">2</option>
                                                 <option value="3">3</option>
                                                 <option value="4">4</option>
@@ -107,27 +107,38 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label for="new-game-num-decks">Players</label>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <button id="new-game-add-player-button" class="btn btn-default pull-right" onclick="addPlayerRow()">Add Player</button>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <button class="btn btn-default pull-right">Add Player</button>
-                                            <label for="new-game-num-decks">Players</label>
                                             <table>
                                                 <thead>
                                                     <tr>
-                                                        <td width="70%">Name</td>
-                                                        <td width="30%">Starting Money</td>
+                                                        <td width="50%">Name</td>
+                                                        <td width="30%">Starting $</td>
+                                                        <td width="20%">Remove</td>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="new-game-players-tbody">
                                                     <tr>
                                                         <td>
                                                             <input type="hidden" class="player-number" value="1" />
-                                                            <input type="text" maxlength="10" class="form-control player-name" value="John Doe" />
+                                                            <input type="text" maxlength="10" class="form-control player-name" value="Player 1" />
                                                         </td>
                                                         <td>
-                                                            <input type="number" class="player-money" value="100" />
+                                                            <input type="number" class="form-control player-money" value="100" />
                                                         </td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -137,10 +148,10 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Start Game</button>
+                        <button type="button" class="btn btn-success" onclick="onStartGame()">Start Game</button>
                     </div>
                 </div>
-            <div>
+            </div>
         </div>
         <script src="./js/main.js"></script>
     </body>

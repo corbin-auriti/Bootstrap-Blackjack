@@ -18,13 +18,15 @@ function shuffleDeck(numDecks = 1) {
                     currentGame.deck.push({
                         class: "card " + suite + " " + value,
                         values: [ 1, 10 ],
-                        value: 1
+                        value: 1,
+                        facedown: 0
                     });
                 } else {
                     currentGame.deck.push({
                         class: "card " + suite + " " + value,
                         values: [ ((i + 1 > 10) ? 10 : i + 1) ],
-                        value: ((i + 1 > 10) ? 10 : i + 1)
+                        value: ((i + 1 > 10) ? 10 : i + 1),
+                        facedown: 0
                     });
                 }
             });
@@ -41,23 +43,29 @@ function shuffleDeck(numDecks = 1) {
     }
 }
 
-function dealCardToPlayer(card, player) {
+function dealCardToPlayer(player) {
 
+    var card = currentGame.deck.pop();
+    card.facedown = false;
+    
     player.hand.push(card);
+    
+    renderPlayer(player);
 }
 
-// Render a new card to a card stack zone
-function addCardToStack(card, cardStackZone) {
-    
+function dealCardToDealer() {
 
-}
-
-// Add a new player to the game
-function addPlayer(player) {
+    var card = currentGame.deck.pop();
     
-    currentGame.players.push(player);
+    if($("#dealer-card-zone .card").length > 0) {
+        card.facedown = false;
+    } else {
+        card.facedown = true;
+    }
     
-    renderPlayers();
+    currentGame.dealerHand.push(card);
+    
+    renderDealer();
 }
 
 function renderPlayers() {
@@ -89,49 +97,159 @@ function renderPlayers() {
 
 function addPlayerZone(player, className) {
 
-    $("<div id='" + player.id + "' class='" + className + " player-zone'><div class='container-fluid'><div class='row'><div class='col-xs-12 card-stack-zone stack-up'></div></div><div class='row'><div class='col-xs-12'><h2 class='text-center player-name'></h2><h2 class='text-center'><span class='current-points'>0</span> <small>pts</small></h2><h4> class='text-center value'></h4></div></div></div></div>").appendTo("#player-zones");
+    $("<div id='player" + player.id + "' class='" + className + " player-zone'><div class='container-fluid'><div class='row'><div class='col-xs-12 card-stack-zone stack-up'></div></div><div class='row'><div class='col-xs-12'><h2 class='text-center player-name'></h2><h2 class='text-center'><span class='current-points'>0</span> <small>pts</small></h2><h4 class='text-center value'></h4></div></div></div></div>").appendTo("#player-zones");
+    
+    renderPlayer(player);
 }
 
 function renderPlayer(player) {
 
-    $(player.id + " .player-name").html(player.name);
+    $("#player" + player.id + " .player-name").html(player.name);
 
     var currentPts = 0;
 
+    $("#player" + player.id + ".card-stack-zone").empty();
+    
+    var x = 10;
+    var y = 10;
+    
     $.each(player.hand, function(i, card) {
         
         currentPts += card.value;
+        
+        if($("#player" + player.id + " .card-stack-zone").hasClass("stack-down")) {
+            $("<div class='" + ((card.facedown) ? "card face-down" : ("card " + card.class)) + "' style='top: " + y + "px; left: " + x + "px;'" + "></div>").appendTo("#player" + player.id + " .card-stack-zone");
+        } else {
+            $("<div class='" + ((card.facedown) ? "card face-down" : ("card " + card.class)) + "' style='bottom: " + y + "px; left: " + x + "px;'" + "></div>").appendTo("#player" + player.id + " .card-stack-zone");;
+        }
+              
+        x += 20;
+        y += 20;
     });
 
-    $(player.id + " .current-points").html(currentPts);
+    $("#player" + player.id + " .current-points").html(currentPts);
+}
+
+function renderDealer() {
+
+    $("#dealer-card-zone").empty();
+    
+    var x = 10;
+    var y = 10;
+    
+    var currentPts = 0;
+    
+    $.each(currentGame.dealerHand, function(i, card) {
+        
+        if(card.facedown == false) {
+            currentPts += card.value;
+        }
+        
+        $("<div class='" + ((card.facedown) ? "card face-down" : ("card " + card.class)) + "' style='top: " + y + "px; left: " + x + "px;'" + "></div>").appendTo("#dealer-card-zone");            
+              
+        x += 20;
+        y += 20;
+    });
+
+    $("#dealer-current-points").html(currentPts);
 }
 
 // Reset current game and create a new game with the newly loaded players and game settings
 function newGame() {
     
+    $("#new-game-modal").modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: true
+    });
+}
+
+function addPlayerRow() {
     
+    var rows = $("#new-game-players-tbody > tr").length;
+    
+    rows += 1;
+    
+    $("#new-game-players-tbody").append("<tr id='player-row-" + rows + "'><td><input type='hidden' class='player-number' value='" + rows + "' /><input type='text' maxlength='10' class='form-control player-name' value='Player " + rows + "' /></td><td><input type='number' class='form-control player-money' value='100' /></td><td><button class='btn btn-danger' style='font-style: bold;' onclick='removePlayerRow(\"#player-row-" + rows + "\")'>X</button></td></tr>");
+    
+    if(rows >= 4) {
+        $("#new-game-add-player-button").attr("disabled", "disabled");
+    }
+}
+
+function removePlayerRow(id) {
+    
+    $(id).remove();
+    
+    var rows = $("#new-game-players-tbody > tr").length;
+    
+    if(rows < 4) {
+        $("#new-game-add-player-button").prop("disabled", false);
+    }
 }
 
 function onStartGame() {
 
+    $("#new-game-modal").modal('hide');
+    
+    var background = $("#new-game-background-select").val();
+    
+    var numDecks = $("#new-game-num-decks").val();
+    
     currentGame = {
         deck: [],
         players: [],
         deckIndex: 0,
+        dealerHand: [],
         settings: {
-            background: "/img/background.jpg",
-            numberOfDecks: 1
+            background: background,
+            numberOfDecks: numDecks
         },
         env: {
             firstRender: 1
         }
     };
 
+    $("#new-game-players-tbody > tr").each(function(i, elem) {
+        
+        var id = $(elem).find("input.player-number").val();
+        var name = $(elem).find("input.player-name").val();
+        var value = $(elem).find("input.player-money").val();
+        
+        var player = {
+            id: id,
+            name: name,
+            value: value,
+            hand: [],
+            hits: 0,
+            busts: 0,
+            hands: 0
+        };
+        
+        currentGame.players.push(player);
+    });
+    
     shuffleDeck(currentGame.settings.numberOfDecks);
+    
+    renderPlayers();
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        dealCardToPlayer(player);
+    });
+    
+    dealCardToDealer();
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        dealCardToPlayer(player);
+    });
+    
+    dealCardToDealer();
 }
 
 // Initialize the page
 $(document).ready(function() {
     
-    shuffleDeck();
+    newGame();
 });

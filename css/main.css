@@ -2,10 +2,6 @@
     font-family: 'Open Sans', sans-serif;
 }
 
-html, body {
-    height: 100%;
-}
-
 body {
     background-image: url("../img/background.jpg");
     background-position: center center;
@@ -22,6 +18,10 @@ div#main-content {
 div#main-content * {
     
     color: white;
+}
+
+tbody#new-game-players-tbody td {
+    padding: 5px 10px 5px 0px;
 }
 
 .card {
