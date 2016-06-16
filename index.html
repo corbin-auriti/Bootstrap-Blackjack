@@ -51,22 +51,46 @@
                                 <h2 class="text-center"><span id="dealer-current-points">0</span> <small>pts</small></h2>
                             </div>
                         </div>
+                        <div id="show-results-wrapper" class="row hide">
+                            <div class="col-xs-12">
+                                <button class="btn btn-info btn-lg" onclick="showResults()">Show Results</button>
+                                <button class="btn btn-primary btn-lg" onclick="newHand()">New Hand</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div id="separator-zone" class="row">
                 <div class="col-xs-12">
-                    <br /><br /><br /><br />
+                    <br />
                 </div>
             </div>
             <div id="player-zones" class="row">
                  
             </div>
         </div>
-        <div id="ace-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ace-modal-label" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                <h3></h3>
+        <div id="results-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="results-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h3>Results</h3>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="50%">Player Name</th>
+                                    <th width="25%">Result</th>
+                                    <th width="25%">Earnings</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-table-tbody">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="new-game-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="new-game-modal-label" aria-hidden="true">
@@ -84,7 +108,8 @@
                                         <div class="form-group">
                                             <label for="new-game-background-select">Background Image</label>
                                             <select id="new-game-background-select" name="new-game-background-select" class="form-control">
-                                                <option value="/img/background.jpg" selected>Blue Background</option>
+                                                <option value="/img/background2.jpg" selected>Green Background</option>
+                                                <option value="/img/background.jpg">Blue Background</option>
                                             </select>
                                         </div>
                                     </div>
@@ -116,12 +141,12 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <table>
+                                            <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <td width="50%">Name</td>
-                                                        <td width="30%">Starting $</td>
-                                                        <td width="20%">Remove</td>
+                                                        <th width="50%">Name</th>
+                                                        <th width="30%">Starting $</th>
+                                                        <th width="20%">Remove</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="new-game-players-tbody">
@@ -133,6 +158,7 @@
                                                         <td>
                                                             <input type="number" class="form-control player-money" value="100" />
                                                         </td>
+                                                        <td></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

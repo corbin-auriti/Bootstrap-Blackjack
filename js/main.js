@@ -1,4 +1,6 @@
 
+var modalNum = 1;
+
 var currentGame = {};
 
 // Shuffles the deck, like casinos, deck can be shuffled with multiple decks to make counting cards more difficult
@@ -86,7 +88,7 @@ function dealCardToDealer() {
 
     var card = currentGame.deck.pop();
     
-    if($("#dealer-card-zone .card").length > 0) {
+    if(currentGame.dealer.hand.length > 0) {
         card.facedown = false;
     } else {
         card.facedown = true;
@@ -160,7 +162,7 @@ function renderPlayer(player) {
 
     $("#player" + player.id + " .player-name").html(player.name);
 
-    $("#player" + player.id + ".card-stack-zone").empty();
+    $("#player" + player.id + " .card-stack-zone").empty();
     
     var x = 10;
     var y = 10;
@@ -222,11 +224,14 @@ function nextPlayer() {
         
         var player = currentGame.players[currentGame.playerIndex];
     
-        $("#player" + player.id + " button").each(function(i, elem) {
+        if(player.blackjack == true || player.busted == true) {
+            nextPlayer();
+        } else {
+            $("#player" + player.id + " button").each(function(i, elem) {
 
-            $(elem).prop("disabled", false);
-        });
-        
+                $(elem).prop("disabled", false);
+            });
+        }
     } else {
         
         dealersTurn();
@@ -248,6 +253,44 @@ function dealersTurn() {
     }
     
     renderDealer();
+    
+    console.log(currentGame.dealer);
+    
+    $("#show-results-wrapper").removeClass("hide");
+}
+
+function showResults() {
+    
+    $("#results-table-tbody").empty();
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        var rowClass = "";
+        var status = "";
+        
+        if(player.busted == true) {
+            rowClass = "danger";
+            status = "Busted";
+        } else if (player.score < currentGame.dealer.score && currentGame.dealer.busted == false) {
+            rowClass = "danger";
+            status = "Lost";
+        } else if (player.blackjack == true) {
+            if(currentGame.dealer.blackjack == true) {
+                rowClass = "";
+                status = "Tied";
+            } else {
+                rowClass = "success";
+                status = "Blackjack";
+            }
+        } else if (player.score > currentGame.dealer.score || (player.busted == false && currentGame.dealer.busted == true)) {
+            rowClass = "success";
+            status = "Won";
+        }
+        
+        $("<tr class='" + rowClass + "'><td>" + player.name + "</td><td>" + status + "</td><td></td></tr>").appendTo("#results-table-tbody");
+        
+        $("#results-modal").modal('show');
+    });
 }
 
 // Reset current game and create a new game with the newly loaded players and game settings
@@ -262,11 +305,13 @@ function newGame() {
 
 function addPlayerRow() {
     
+    modalNum++;
+    
     var rows = $("#new-game-players-tbody > tr").length;
     
     rows += 1;
     
-    $("#new-game-players-tbody").append("<tr id='player-row-" + rows + "'><td><input type='hidden' class='player-number' value='" + rows + "' /><input type='text' maxlength='10' class='form-control player-name' value='Player " + rows + "' /></td><td><input type='number' class='form-control player-money' value='100' /></td><td><button class='btn btn-danger' style='font-style: bold;' onclick='removePlayerRow(\"#player-row-" + rows + "\")'>X</button></td></tr>");
+    $("#new-game-players-tbody").append("<tr id='player-row-" + rows + "'><td><input type='hidden' class='player-number' value='" + modalNum + "' /><input type='text' maxlength='10' class='form-control player-name' value='Player " + modalNum + "' /></td><td><input type='number' class='form-control player-money' value='100' /></td><td><button class='btn btn-danger' style='font-style: bold;' onclick='removePlayerRow(\"#player-row-" + rows + "\")'>X</button></td></tr>");
     
     if(rows >= 4) {
         $("#new-game-add-player-button").attr("disabled", "disabled");
@@ -311,6 +356,8 @@ function onStartGame() {
         }
     };
 
+    $("body").css("background-image", "url('" + currentGame.settings.background + "')");
+    
     $("#new-game-players-tbody > tr").each(function(i, elem) {
         
         var id = $(elem).find("input.player-number").val();
@@ -330,15 +377,30 @@ function onStartGame() {
         currentGame.players.push(player);
     });
     
+    newHand();
+}
+
+function newHand() {
+    
+    currentGame.playerIndex = -1;
+    
+    $("#show-results-wrapper").addClass("hide");
+    
     shuffleDeck(currentGame.settings.numberOfDecks);
     
     renderPlayers();
     
     $.each(currentGame.players, function(i, player) {
         
+        player.blackjack = false;
+        player.busted = false;
+        player.hand = [];
         dealCardToPlayer(player);
     });
     
+    currentGame.dealer.blackjack = false;
+    currentGame.dealer.busted = false;
+    currentGame.dealer.hand = [];
     dealCardToDealer();
     
     $.each(currentGame.players, function(i, player) {
