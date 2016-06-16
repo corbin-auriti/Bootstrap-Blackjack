@@ -267,6 +267,7 @@ function showResults() {
         
         var rowClass = "";
         var status = "";
+        var earnings = "";
         
         if(player.busted == true) {
             rowClass = "danger";
@@ -278,6 +279,7 @@ function showResults() {
             if(currentGame.dealer.blackjack == true) {
                 rowClass = "";
                 status = "Tied";
+                earnings = "$0.00";
             } else {
                 rowClass = "success";
                 status = "Blackjack";
@@ -285,6 +287,13 @@ function showResults() {
         } else if (player.score > currentGame.dealer.score || (player.busted == false && currentGame.dealer.busted == true)) {
             rowClass = "success";
             status = "Won";
+        } else if (player.score == 21 && player.blackjack == false && currentGame.dealer.blackjack == true) {
+            rowClass = "danger";
+            status = "Lost";
+        } else if (player.score == currentGame.dealer.score && player.busted == false && currentGame.dealer.busted == false) {
+            rowClass = "";
+            status = "Tied";
+            earnings = "$0.00";
         }
         
         $("<tr class='" + rowClass + "'><td>" + player.name + "</td><td>" + status + "</td><td></td></tr>").appendTo("#results-table-tbody");
