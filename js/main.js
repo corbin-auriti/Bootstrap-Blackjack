@@ -153,7 +153,7 @@ function renderPlayers() {
 
 function addPlayerZone(player, className) {
 
-    $("<div id='player" + player.id + "' class='" + className + " player-zone'><div class='container-fluid'><div class='row'><div class='col-xs-12 card-stack-zone stack-up'></div></div><div class='row'><div class='col-xs-12'><h2 class='text-center player-name'></h2><h2 class='text-center'><span class='current-points'>0</span> <small>pts</small></h2><h4 class='text-center value'></h4></div></div><div class='row'><div class='col-xs-12'><button class='btn btn-primary btn-lg' style='margin-right: 20px;' onclick='playerHit()' disabled> Hit </button><button class='btn btn-info btn-lg' onclick='nextPlayer()' disabled>Stand</button></div></div></div></div>").appendTo("#player-zones");
+    $("<div id='player" + player.id + "' class='" + className + " player-zone'><div class='container-fluid'><div class='row'><div class='col-xs-12 card-stack-zone stack-up'></div></div><div class='row'><div class='col-md-6'><h2 class='player-name'></h2><h2><span class='current-points'>0</span> <small>pts</small></h2><h4 class='text-center value'></h4></div><div class='col-md-6'><h3>Value: <span class='player-value'>0</span></h3><h3>Bet: <span class='player-bet'>0</span></h3></div></div><div class='row'><div class='col-xs-12'><button class='btn btn-primary btn-lg' style='margin-right: 20px;' onclick='playerHit()' disabled> Hit </button><button class='btn btn-info btn-lg' onclick='nextPlayer()' disabled>Stand</button></div></div></div></div>").appendTo("#player-zones");
     
     renderPlayer(player);
 }
@@ -161,7 +161,11 @@ function addPlayerZone(player, className) {
 function renderPlayer(player) {
 
     $("#player" + player.id + " .player-name").html(player.name);
-
+    
+    $("#player" + player.id + " .player-value").html("$" + player.value.toFixed(0));
+    
+    $("#player" + player.id + " .player-bet").html("$" + player.currentBet.toFixed(0));
+    
     $("#player" + player.id + " .card-stack-zone").empty();
     
     var x = 10;
@@ -224,7 +228,7 @@ function nextPlayer() {
         
         var player = currentGame.players[currentGame.playerIndex];
     
-        if(player.blackjack == true || player.busted == true) {
+        if(player.blackjack == true || player.busted == true || player.value <= 0) {
             nextPlayer();
         } else {
             $("#player" + player.id + " button").each(function(i, elem) {
@@ -254,7 +258,17 @@ function dealersTurn() {
     
     renderDealer();
     
-    console.log(currentGame.dealer);
+    $.each(currentGame.players, function(i, player) {
+        if(player.busted == true || (player.score < currentGame.dealer.score && currentGame.dealer.busted == false) || (player.score == 21 && player.blackjack == false && currentGame.dealer.blackjack == true)) {
+            player.value -= player.currentBet;
+        } else if (player.blackjack == true) {
+            if(currentGame.dealer.blackjack == false) {
+                player.value += 1.5 * player.currentBet;
+            }
+        } else if (player.score > currentGame.dealer.score || (player.busted == false && currentGame.dealer.busted == true)) {
+            player.value += player.currentBet;
+        }
+    });
     
     $("#show-results-wrapper").removeClass("hide");
 }
@@ -272,9 +286,11 @@ function showResults() {
         if(player.busted == true) {
             rowClass = "danger";
             status = "Busted";
+            earnings = "$" + (-1 * player.currentBet).toFixed(2);
         } else if (player.score < currentGame.dealer.score && currentGame.dealer.busted == false) {
             rowClass = "danger";
             status = "Lost";
+            earnings = "$" + (-1 * player.currentBet).toFixed(2);
         } else if (player.blackjack == true) {
             if(currentGame.dealer.blackjack == true) {
                 rowClass = "";
@@ -283,20 +299,23 @@ function showResults() {
             } else {
                 rowClass = "success";
                 status = "Blackjack";
+                earnings = "$" + (1.5 * player.currentBet).toFixed(2);
             }
         } else if (player.score > currentGame.dealer.score || (player.busted == false && currentGame.dealer.busted == true)) {
             rowClass = "success";
             status = "Won";
+            earnings = "$" + player.currentBet.toFixed(2);
         } else if (player.score == 21 && player.blackjack == false && currentGame.dealer.blackjack == true) {
             rowClass = "danger";
             status = "Lost";
+            earnings = "$" + (-1 * player.currentBet).toFixed(2);
         } else if (player.score == currentGame.dealer.score && player.busted == false && currentGame.dealer.busted == false) {
             rowClass = "";
             status = "Tied";
             earnings = "$0.00";
         }
         
-        $("<tr class='" + rowClass + "'><td>" + player.name + "</td><td>" + status + "</td><td></td></tr>").appendTo("#results-table-tbody");
+        $("<tr class='" + rowClass + "'><td>" + player.name + "</td><td>" + status + "</td><td>" + earnings + "</td></tr>").appendTo("#results-table-tbody");
         
         $("#results-modal").modal('show');
     });
@@ -371,12 +390,13 @@ function onStartGame() {
         
         var id = $(elem).find("input.player-number").val();
         var name = $(elem).find("input.player-name").val();
-        var value = $(elem).find("input.player-money").val();
+        var value = parseInt($(elem).find("input.player-money").val());
         
         var player = {
             id: id,
             name: name,
             value: value,
+            currentBet: 10,
             hand: [],
             busted: false,
             blackjack: false,
@@ -386,10 +406,62 @@ function onStartGame() {
         currentGame.players.push(player);
     });
     
-    newHand();
+    placeBets();
+}
+
+function decreaseBet(id) {
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        if(player.id == id) {
+            
+            if(player.currentBet - 5 >= 10) {
+                player.currentBet -= 5;
+                $("#player-bet-input-" + id).val(player.currentBet);
+            }
+        }
+    });
+}
+
+function increaseBet(id) {
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        if(player.id == id) {
+            
+            if(player.currentBet + 5 <= player.value) {
+                player.currentBet += 5;
+                $("#player-bet-input-" + id).val(player.currentBet);
+            }
+        }
+    });
+}
+
+function placeBets() {
+    
+    $("#betting-tbody").empty();
+    
+    $.each(currentGame.players, function(i, player) {
+        
+        if(player.value < 10) {
+            player.currentBet = player.value;
+        } else {
+            player.currentBet = 10;
+        }
+        
+        $("<tr><td>" + player.name + "</td><td><button type='button' class='btn btn-default btn-sm col-xs-2' onclick='decreaseBet(" + player.id + ")'>-</button> <div class='col-xs-6 col-xs-offset-1'><input id='player-bet-input-" + player.id + "' class='form-control' type='number' size='3' maxlength='3' value='" + player.currentBet + "' readonly /></div><button class='btn btn-default btn-sm col-xs-2 col-xs-offset-1' type='button' onclick='increaseBet(" + player.id +")'>+</button></td></tr>").appendTo("#betting-tbody");
+    });
+    
+    $("#betting-modal").modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: true
+    });
 }
 
 function newHand() {
+    
+    $("#betting-modal").modal('hide');
     
     currentGame.playerIndex = -1;
     
@@ -404,7 +476,11 @@ function newHand() {
         player.blackjack = false;
         player.busted = false;
         player.hand = [];
-        dealCardToPlayer(player);
+        player.score = 0;
+        
+        if(player.value > 0) {
+            dealCardToPlayer(player);
+        }
     });
     
     currentGame.dealer.blackjack = false;
@@ -414,7 +490,11 @@ function newHand() {
     
     $.each(currentGame.players, function(i, player) {
         
-        dealCardToPlayer(player);
+        if(player.value > 0) {
+            dealCardToPlayer(player);
+        } else {
+            renderPlayer(player);
+        }
     });
     
     dealCardToDealer();
