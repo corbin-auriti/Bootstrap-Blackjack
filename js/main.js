@@ -124,6 +124,109 @@ function dealCardToDealer() {
     renderDealer();
 }
 
+function getAllUserData() {
+
+    var users = getUsersList();
+
+    var allUserStats = [];
+
+    $.each(users, function(i, user) {
+
+        var userObj = getUserStats(user);
+
+        if(userObj != null) {
+            
+            allUserStats.push(userObj);
+        }
+    });
+
+    return allUserStats;
+}
+
+function getUserStats(user) {
+
+    var userStatsStr = localStorage.getItem(user);
+
+    if(userStatsStr != null) {
+        return JSON.parse(userStatsStr);
+    } else {
+        return null;
+    }
+}
+
+function getUsersList() {
+
+    if(Storage != "undefined") {
+
+        var usersStr = localStorage.getItem("users-list");
+        
+        var users = [];
+
+        if(usersStr != null) {
+            users = JSON.parse(usersStr);
+        }
+
+        return users;
+    } else {
+        return [];
+    }
+}
+
+function addUserToList(user) {
+
+    if(Storage != "undefined") {
+
+        var users = getUsersList();
+
+        if(users.indexOf(user) < 0) {
+
+            users.push(user);
+
+            localStorage.setItem("users-list", JSON.stringify(users));
+        }
+    }
+}
+
+function addUserStats(user, earnings, win, loss, tie) {
+
+    if(Storage != "undefined") {
+
+        var users = getUsersList();
+
+        var userObj = {
+            name: user,
+            wins: win,
+            losses: loss,
+            ties: tie,
+            total: 1,
+            earningsSum: earnings,
+            earningsAvg: earnings
+        };
+
+        if(users.indexOf(user) >= 0) {
+            
+            var userObjTemp = getUserStats(user);
+
+            if(userObjTemp != null) {
+
+                userObj = userObjTemp;
+
+                userObj.earningsSum += earnings;
+                userObj.total++;
+                userObj.wins += win;
+                userObj.losses += loss;
+                userObj.ties += tie;
+                userObj.earningsAvg = userObj.earningsSum / userObj.total;
+            }
+        } else {
+
+            addUserToList(user);
+        }
+
+        localStorage.setItem(user, userObj);
+    }
+}
+
 function renderPlayers() {
     
     $("#player-zones").empty();
@@ -457,6 +560,11 @@ function placeBets() {
         keyboard: false,
         show: true
     });
+}
+
+function showGameStatistics() {
+
+    
 }
 
 function newHand() {
