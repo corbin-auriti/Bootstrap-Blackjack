@@ -24,6 +24,7 @@
                 <div id="main-navbar-menu" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#" onclick="newGame()">New Game</a></li>
+                        <li><a href="#" onclick="showStats()">Game Stats</a></li>
                     </ul>
                 </div>
             </div>
@@ -67,6 +68,34 @@
             </div>
             <div id="player-zones" class="row">
                  
+            </div>
+        </div>
+        <div id="stats-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="stats-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h3>Game Statistics</h3>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="25%">Player Name</th>
+                                    <th width="12%">Total</th>
+                                    <th width="12%">Wins</th>
+                                    <th width="12%">Losses</th>
+                                    <th width="12%">Ties</th>
+                                    <th width="12%">Win %</th>
+                                    <th width="15%">Avg $</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stats-table-tbody">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="results-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="results-modal-label" aria-hidden="true">
@@ -133,8 +162,8 @@
                                         <div class="form-group">
                                             <label for="new-game-background-select">Background Image</label>
                                             <select id="new-game-background-select" name="new-game-background-select" class="form-control">
-                                                <option value="/img/background2.jpg" selected>Green Background</option>
-                                                <option value="/img/background.jpg">Blue Background</option>
+                                                <option value="./img/background2.jpg" selected>Green Background</option>
+                                                <option value="./img/background.jpg">Blue Background</option>
                                             </select>
                                         </div>
                                     </div>
